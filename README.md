@@ -4,7 +4,7 @@ Four-handed no-limit Texas hold'em against three bots with different
 temperaments. One HTML file, no build step, no dependencies. Installs to a
 phone home screen and plays offline.
 
-**Play it:** https://YOUR-USERNAME.github.io/back-room/
+**Play it:** bfd12345.github.io/back-room/
 
 ---
 
