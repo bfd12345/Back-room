@@ -1,9 +1,8 @@
 /* The Back Room — service worker
-   App shell is pre-cached so the game runs with no connection at all.
-   Fonts are cached opportunistically the first time they load. */
+   The whole app is pre-cached. There are no external requests at all,
+   so once installed it runs with the connection off. */
 
-const SHELL = "backroom-shell-v1";
-const RUNTIME = "backroom-runtime-v1";
+const SHELL = "backroom-shell-v2";
 
 const FILES = [
   "./",
@@ -27,7 +26,7 @@ self.addEventListener("activate", e => {
   e.waitUntil(
     caches.keys()
       .then(keys => Promise.all(
-        keys.filter(k => k !== SHELL && k !== RUNTIME).map(k => caches.delete(k))
+        keys.filter(k => k !== SHELL).map(k => caches.delete(k))
       ))
       .then(() => self.clients.claim())
   );
@@ -38,24 +37,10 @@ self.addEventListener("fetch", e => {
   if (req.method !== "GET") return;
 
   const url = new URL(req.url);
-  const isFont = /fonts\.(googleapis|gstatic)\.com$/.test(url.hostname);
-
   // Navigations: serve the shell so the app opens offline.
   if (req.mode === "navigate") {
     e.respondWith(
       fetch(req).catch(() => caches.match("./index.html"))
-    );
-    return;
-  }
-
-  // Fonts: cache-first, then fill the cache in the background.
-  if (isFont) {
-    e.respondWith(
-      caches.match(req).then(hit => hit || fetch(req).then(res => {
-        const copy = res.clone();
-        caches.open(RUNTIME).then(c => c.put(req, copy)).catch(() => {});
-        return res;
-      }).catch(() => hit))
     );
     return;
   }
