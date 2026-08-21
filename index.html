@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>The Back Room</title>
+<meta name="build" content="v6">
 <meta name="description" content="Four-handed no-limit hold'em against three bots with minds of their own.">
 <meta name="theme-color" content="#06241F">
 <meta name="color-scheme" content="dark">
@@ -130,7 +131,7 @@ body{
   font-family:var(--mono);font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:#8FB8A8;
 }
 .pot-amt{font-family:var(--display);font-weight:600;font-size:1.5rem;color:var(--bone);line-height:1}
-.board{display:flex;gap:.4rem;justify-content:center;min-height:76px;align-items:center}
+.board{display:flex;gap:.45rem;justify-content:center;min-height:87px;align-items:center}
 .street-note{
   font-family:var(--mono);font-size:.64rem;letter-spacing:.2em;text-transform:uppercase;
   color:rgba(220,211,194,.55);min-height:1em;text-align:center;
@@ -163,6 +164,11 @@ body{
 .card.small .idx{font-size:.7rem;top:2px;left:3px}
 .card.small .idx i{font-size:.55rem}
 .card.small .pip{font-size:1rem;right:3px;bottom:1px}
+/* the five shared cards are the thing you actually read — size them up */
+.board .card{width:58px;height:81px}
+.board .card .idx{font-size:1.18rem;top:5px;left:6px}
+.board .card .idx i{font-size:.88rem}
+.board .card .pip{font-size:2rem;right:6px;bottom:2px;opacity:1}
 .card.hero{width:64px;height:90px}
 .card.hero .idx{font-size:1.2rem;top:5px;left:7px}
 .card.hero .idx i{font-size:.9rem}
@@ -208,7 +214,7 @@ body{
   color:#3A2E12;font-family:var(--mono);font-weight:700;font-size:.62rem;
   display:grid;place-items:center;box-shadow:0 2px 5px rgba(0,0,0,.6);
   transform:translate(-50%,-50%);transition:left .35s ease,top .35s ease;
-  z-index:4;
+  z-index:1;
 }
 .say{
   position:absolute;top:-8px;left:50%;transform:translate(-50%,-100%);
@@ -299,36 +305,121 @@ button.ghost{flex:0 1 auto;min-width:0;padding:.44rem .6rem;font-size:.64rem}
 @media (max-width:900px){ .ledger{position:static;max-height:220px} }
 .reset{margin-top:.7rem}
 
-/* ---------- phone: shrink everything to fit inside the oval ---------- */
-@media (max-width:900px){
-  .seat{width:96px;gap:.22rem}
-  .plate{min-width:82px;padding:.26rem .4rem}
-  .plate .name{font-size:.72rem}
-  .plate .tell{font-size:.48rem;letter-spacing:.06em}
-  .plate .stack{font-size:.68rem}
-  .card{width:36px;height:50px}
-  .card .idx{font-size:.72rem;top:2px;left:3px}
-  .card .idx i{font-size:.56rem}
-  .card .pip{font-size:1.1rem;right:3px;bottom:1px}
-  .card.small{width:25px;height:35px}
-  .card.small .idx{font-size:.54rem}
-  .card.small .idx i{font-size:.42rem}
-  .card.small .pip{font-size:.72rem}
-  .card.hero{width:46px;height:64px}
-  .card.hero .idx{font-size:.9rem;top:3px;left:5px}
-  .card.hero .idx i{font-size:.68rem}
-  .card.hero .pip{font-size:1.5rem;right:4px;bottom:1px}
-  .seat-cards{min-height:35px}
-  .board{gap:.25rem;min-height:56px}
-  .pot-amt{font-size:1.15rem}
-  .banner{top:63%;padding:.4rem .7rem}
-  .banner .who{font-size:.86rem}
-  .banner .with{display:block;margin-left:0;font-size:.7rem}
+/* =========================================================
+   PHONE — PORTRAIT
+   The oval fights a tall screen, so portrait drops it: a felt
+   panel with the opponents in a row, the board in the middle,
+   and your hand at the bottom. Normal flow, nothing overlaps.
+   ========================================================= */
+@media (max-width:900px) and (orientation:portrait){
+  .rail{aspect-ratio:auto;border-radius:16px;padding:9px}
+  .felt{
+    border-radius:11px;height:auto;overflow:visible;
+    display:flex;flex-wrap:wrap;align-items:flex-start;
+    padding:.85rem .5rem 1rem;row-gap:.9rem;
+  }
+  .felt::before{border-radius:11px}
+  .felt::after{display:none}                 /* the betting-line ellipse */
+
+  .seat{
+    position:relative;transform:none;left:auto;top:auto;
+    width:33.333%;gap:.28rem;order:1;
+  }
+  .seat.hero-seat{
+    order:3;width:100%;flex-direction:row;justify-content:center;
+    align-items:center;gap:.75rem;
+  }
+  .centre{
+    position:static;transform:none;order:2;width:100%;gap:.5rem;
+    padding-top:.2rem;border-top:1px solid rgba(201,162,75,.13);
+  }
+  .hero-seat .seat-cards{min-height:0}
+  .plate{min-width:0;padding:.26rem .35rem;width:100%;max-width:118px}
+  .plate .name{font-size:.74rem}
+  .plate .tell{font-size:.47rem;letter-spacing:.05em}
+  .plate .stack{font-size:.7rem}
+
+  /* speech sits under the plate rather than floating off the felt */
+  .say{
+    position:static;transform:none;animation:fade .25s ease both;
+    margin:0 auto;padding:.12rem .4rem;
+  }
+
+  .card.small{width:30px;height:42px}
+  .card.small .idx{font-size:.6rem;top:2px;left:3px}
+  .card.small .idx i{font-size:.46rem}
+  .card.small .pip{font-size:.85rem}
+  .card.hero{width:54px;height:76px}
+  .card.hero .idx{font-size:1.05rem;top:4px;left:5px}
+  .card.hero .idx i{font-size:.8rem}
+  .card.hero .pip{font-size:1.8rem;right:5px;bottom:1px}
+
+  .board{gap:.3rem;min-height:82px}
+  .board .card{width:56px;height:78px}
+  .board .card .idx{font-size:1.1rem;top:4px;left:5px}
+  .board .card .idx i{font-size:.85rem}
+  .board .card .pip{font-size:1.85rem;right:5px;bottom:1px}
+
+  .seat-cards{min-height:42px}
+  .pot-amt{font-size:1.3rem}
+  .dealer-btn{display:none}
+  .dchip{
+    display:inline-grid;place-items:center;width:14px;height:14px;border-radius:50%;
+    background:radial-gradient(circle at 35% 30%,#FFF6DF,#D8C79A 60%,#9C8850);
+    color:#3A2E12;font-family:var(--mono);font-size:.5rem;font-weight:700;
+    margin-left:.28rem;vertical-align:.06em;
+  }
+  .banner{top:50%}
 }
-@media (max-width:380px){
-  .seat{width:84px}
-  .plate{min-width:72px}
-  .card.hero{width:40px;height:56px}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.dchip{display:none}
+
+/* =========================================================
+   PHONE — LANDSCAPE
+   Rotated, the screen finally matches the table. Keep the oval,
+   fit it to the height, and put the controls alongside.
+   ========================================================= */
+@media (max-width:1000px) and (orientation:landscape){
+  .shell{
+    grid-template-columns:minmax(0,1fr) 232px;gap:.7rem;
+    padding:.4rem .5rem .6rem;align-items:start;
+  }
+  .masthead{display:none}
+  .rail{aspect-ratio:16/10;height:auto;max-height:calc(100dvh - 1.6rem);
+        width:100%;margin:0 auto;padding:1.6%}
+  .table-wrap{display:flex;flex-direction:column;min-width:0}
+  .actions{margin-top:.5rem;padding:.55rem}
+  .act-row{gap:.35rem}
+  .ledger{max-height:calc(100dvh - 1.2rem);padding:.6rem}
+  .log{font-size:.62rem}
+
+  .seat{width:104px;gap:.2rem}
+  .plate{min-width:88px;padding:.22rem .4rem}
+  .plate .name{font-size:.74rem}
+  .plate .tell{font-size:.46rem;letter-spacing:.05em}
+  .plate .stack{font-size:.7rem}
+  .card.small{width:26px;height:36px}
+  .card.small .idx{font-size:.55rem;top:2px;left:2px}
+  .card.small .idx i{font-size:.42rem}
+  .card.small .pip{font-size:.75rem}
+  .card.hero{width:44px;height:62px}
+  .card.hero .idx{font-size:.88rem;top:3px;left:4px}
+  .card.hero .idx i{font-size:.66rem}
+  .card.hero .pip{font-size:1.45rem}
+  .seat-cards{min-height:36px}
+  .board{gap:.3rem;min-height:70px}
+  .board .card{width:48px;height:67px}
+  .board .card .idx{font-size:.95rem;top:3px;left:4px}
+  .board .card .idx i{font-size:.72rem}
+  .board .card .pip{font-size:1.6rem}
+  .centre{gap:.35rem;top:48%}
+  .pot-amt{font-size:1.15rem}
+}
+@media (max-width:380px) and (orientation:portrait){
+  .board .card{width:48px;height:67px}
+  .board .card .pip{font-size:1.6rem}
+  .card.hero{width:48px;height:67px}
+  .card.small{width:26px;height:36px}
 }
 
 @media (prefers-reduced-motion:reduce){
@@ -538,17 +629,19 @@ const START_STACK = 1000;
 const SB = 10, BB = 20;
 
 /* seat coordinates as % of the felt */
+/* dx/dy park the dealer button beside a seat rather than on top of its cards */
 const SEAT_POS = [
-  {x:50, y:82},  // you
-  {x:12, y:45},  // left
-  {x:50, y:14},  // top
-  {x:88, y:45}   // right
+  {x:50, y:82, dx: 21, dy: -3},  // you
+  {x:12, y:45, dx: 13, dy: 11},  // left
+  {x:50, y:14, dx: 21, dy:  3},  // top
+  {x:88, y:45, dx:-13, dy: 11}   // right
 ];
+/* phone landscape: same ring, pulled in a touch so nothing meets the rail */
 const SEAT_POS_NARROW = [
-  {x:50, y:84},
-  {x:15, y:47},
-  {x:50, y:15},
-  {x:85, y:47}
+  {x:50, y:80, dx: 20, dy: -4},  // you
+  {x:14, y:44, dx: 14, dy: 13},  // left
+  {x:50, y:16, dx: 20, dy:  4},  // top
+  {x:86, y:44, dx:-14, dy: 13}   // right
 ];
 
 /* =========================================================
@@ -1035,7 +1128,8 @@ function chipStack(amount, max){
 
 function render(){
   const felt = el("felt");
-  const narrow = window.matchMedia("(max-width:900px)").matches;
+  const stacked = window.matchMedia("(max-width:900px) and (orientation:portrait)").matches;
+  const narrow  = window.matchMedia("(max-width:1000px)").matches;
   const POS = narrow ? SEAT_POS_NARROW : SEAT_POS;
 
   // seats
@@ -1044,8 +1138,11 @@ function render(){
     const s = document.createElement("div");
     s.className = "seat" + (p.folded||p.out ? " folded" : "") +
                   (G.actor === p.i ? " acting" : "") + (p.winner ? " winner" : "");
-    s.style.left = POS[p.i].x + "%";
-    s.style.top = POS[p.i].y + "%";
+    if (p.hero) s.classList.add("hero-seat");
+    if (!stacked){                       // stacked portrait lays out in normal flow
+      s.style.left = POS[p.i].x + "%";
+      s.style.top  = POS[p.i].y + "%";
+    }
 
     const cards = document.createElement("div");
     cards.className = "seat-cards";
@@ -1058,7 +1155,8 @@ function render(){
     const plate = document.createElement("div");
     plate.className = "plate";
     plate.innerHTML =
-      '<div class="name">' + p.name + '</div>' +
+      '<div class="name">' + p.name +
+        (G.handNo > 0 && G.btn === p.i ? '<span class="dchip">D</span>' : '') + '</div>' +
       (p.style ? '<div class="tell">' + STYLES[p.style].tell + '</div>' : '') +
       '<div class="stack">' + (p.out ? "busted" : fmt(p.chips)) + '</div>';
     s.appendChild(plate);
@@ -1082,11 +1180,13 @@ function render(){
 
   // dealer button
   const db = el("dealerBtn");
-  if (G.handNo > 0){
+  if (G.handNo > 0 && !stacked){
     db.hidden = false;
     const bp = POS[G.btn];
-    db.style.left = (bp.x + (bp.x > 50 ? -13 : bp.x < 50 ? 13 : 0)) + "%";
-    db.style.top  = (bp.y + (bp.y > 50 ? -13 : 13)) + "%";
+    db.style.left = (bp.x + bp.dx) + "%";
+    db.style.top  = (bp.y + bp.dy) + "%";
+  } else if (stacked){
+    db.hidden = true;
   }
 
   // pot
@@ -1141,6 +1241,7 @@ function render(){
 }
 
 window.addEventListener("resize", ()=>{ if (G) render(); });
+window.addEventListener("orientationchange", ()=>{ setTimeout(()=>{ if (G) render(); }, 120); });
 newTable(loadTable());
 
 /* keep the table safe if the app is swiped away mid-hand */

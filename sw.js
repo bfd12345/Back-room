@@ -1,4 +1,4 @@
-const CACHE_NAME = 'backroom-v2';
+const CACHE_NAME = 'backroom-v6';
 const ASSETS = [
   './',
   './index.html',
@@ -7,8 +7,6 @@ const ASSETS = [
   './icon-512.png'
 ];
 
-/* Cache each file on its own. addAll() is all-or-nothing — one 404 and
-   nothing at all gets stored, which looks exactly like "needs the internet". */
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) =>
@@ -31,17 +29,28 @@ self.addEventListener('fetch', (event) => {
   const req = event.request;
   if (req.method !== 'GET') return;
 
-  /* Any navigation in this folder falls back to the cached page, whatever
-     the URL looks like. */
-  if (req.mode === 'navigate') {
+  const url = new URL(req.url);
+  const isPage =
+    req.mode === 'navigate' ||
+    url.pathname.endsWith('/') ||
+    url.pathname.endsWith('/index.html');
+
+  /* The page itself: network first, so an edit shows up on the next load.
+     Falls back to cache the moment there's no connection. */
+  if (isPage) {
     event.respondWith(
-      caches.match(req)
-        .then((hit) => hit || fetch(req))
-        .catch(() => caches.match('./index.html'))
+      fetch(req)
+        .then((res) => {
+          const copy = res.clone();
+          caches.open(CACHE_NAME).then((c) => c.put('./index.html', copy)).catch(() => {});
+          return res;
+        })
+        .catch(() => caches.match(req).then((hit) => hit || caches.match('./index.html')))
     );
     return;
   }
 
+  /* Icons and manifest never change without a version bump — cache first. */
   event.respondWith(
     caches.match(req).then((cached) => cached || fetch(req))
   );
